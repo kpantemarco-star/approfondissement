@@ -1,12 +1,374 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DADJOSSIME — Martin Kpanté</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --accent: #e8c87d;
+      --accent2: #7dc4e8;
+      --text: #f0ede8;
+      --muted: #6b6b7a;
+      --border: rgba(232, 200, 125, 0.15);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 30%, rgba(125, 196, 232, 0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 60% at 80% 70%, rgba(232, 200, 125, 0.08) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Grain overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 80px 40px;
+    }
+
+    /* Header tag */
+    .tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      color: var(--accent);
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.1s;
+    }
+
+    /* Name */
+    .name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(52px, 9vw, 96px);
+      font-weight: 700;
+      line-height: 0.95;
+      margin-top: 16px;
+      opacity: 0;
+      animation: fadeUp 0.9s ease forwards 0.25s;
+    }
+
+    .name span {
+      display: block;
+      color: var(--accent);
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    /* Divider line */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 40px 0;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.4s;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .divider-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    /* Location badge */
+    .location-bar {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.5s;
+    }
+
+    .location-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .location-icon {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .location-label {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .location-value {
+      font-size: 13px;
+      color: var(--text);
+      margin-top: 2px;
+    }
+
+    /* Cards grid */
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 48px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(232, 200, 125, 0.35);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .card:hover::before { opacity: 1; }
+
+    .card:nth-child(1) { animation: fadeUp 0.8s ease forwards 0.6s; }
+    .card:nth-child(2) { animation: fadeUp 0.8s ease forwards 0.7s; }
+    .card:nth-child(3) { animation: fadeUp 0.8s ease forwards 0.75s; grid-column: 1 / -1; }
+
+    .card-label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .card-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .card-value.email {
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--accent2);
+      word-break: break-all;
+    }
+
+    .card-icon {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+
+    /* Contact card wide */
+    .card.wide {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .card.wide .card-value.email {
+      font-size: 16px;
+    }
+
+    .contact-btn {
+      flex-shrink: 0;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .contact-btn:hover {
+      opacity: 0.85;
+      transform: scale(0.97);
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 64px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.9s;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-left {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: #4caf7d;
+      border-radius: 50%;
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .container { padding: 48px 24px; }
+      .cards { grid-template-columns: 1fr; }
+      .card:nth-child(3) { grid-column: 1; }
+      .card.wide { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
 </head>
 <body>
-    <p>hello martinique</p>
-    <p>DADJOSSIME-Kpanté Martin-kpantemarco@gmail.com </p>
+  <div class="container">
+
+    <p class="tag">— Portfolio & Présentation</p>
+
+    <h1 class="name">
+      DADJOSSIME
+      <span>Martin Kpanté</span>
+    </h1>
+
+    <div class="divider">
+      <div class="divider-dot"></div>
+      <div class="divider-dot"></div>
+      <div class="divider-dot"></div>
+    </div>
+
+    <div class="location-bar">
+      <div class="location-item">
+        <div class="location-icon">🌴</div>
+        <div>
+          <div class="location-label">Localisation</div>
+          <div class="location-value">Martinique, FR</div>
+        </div>
+      </div>
+      <div class="location-item">
+        <div class="location-icon">🛠️</div>
+        <div>
+          <div class="location-label">Statut</div>
+          <div class="location-value">Disponible</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cards">
+
+      <div class="card">
+        <div class="card-icon">👤</div>
+        <div class="card-label">Nom complet</div>
+        <div class="card-value">DADJOSSIME<br>Martin Kpanté</div>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">📍</div>
+        <div class="card-label">Région</div>
+        <div class="card-value">Martinique<br><span style="color:var(--muted);font-size:14px;font-weight:400">Hello Martinique 🌺</span></div>
+      </div>
+
+      <div class="card wide">
+        <div>
+          <div class="card-label">✉️ &nbsp;Adresse email</div>
+          <div class="card-value email">kpantemarco@gmail.com</div>
+        </div>
+        <a href="mailto:kpantemarco@gmail.com" class="contact-btn">Contacter →</a>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      <div class="footer-left">© 2026 DADJOSSIME Martin Kpanté</div>
+      <div class="status">
+        <div class="status-dot"></div>
+        En ligne · Martinique
+      </div>
+    </div>
+
+  </div>
 </body>
 </html>
