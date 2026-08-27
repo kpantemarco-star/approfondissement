@@ -123,6 +123,49 @@
 
     </form>
   </div>
+  <script>
+    const WEBHOOK_URL = 'http://localhost:5678/webhook-test/ef10708d-6b16-448b-a78a-d755702b8116';
+    const WEBHOOK_SECRET = 'tz>oyCd>G*8n|DaKQo1RSX,09>U=';
+
+    const form = document.getElementById('testForm');
+    const statusDiv = document.getElementById('status');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData);
+
+      // Feedback visuel pendant l'envoi
+      statusDiv.classList.remove('hidden', 'text-green-600', 'text-red-600');
+      statusDiv.classList.add('text-gray-500');
+      statusDiv.textContent = 'Envoi en cours...';
+
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Webhook-Secret': WEBHOOK_SECRET
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          statusDiv.classList.remove('text-gray-500');
+          statusDiv.classList.add('text-green-600');
+          statusDiv.textContent = '✓ Envoyé avec succès !';
+          form.reset();
+        } else {
+          throw new Error(`Erreur ${response.status}`);
+        }
+      } catch (error) {
+        statusDiv.classList.remove('text-gray-500');
+        statusDiv.classList.add('text-red-600');
+        statusDiv.textContent = '✗ Erreur : ' + error.message;
+      }
+    });
+  </script>
 
 </body>
 </html>
