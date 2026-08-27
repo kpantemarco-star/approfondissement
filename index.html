@@ -125,7 +125,7 @@
   </div>
   <script>
     const WEBHOOK_URL = 'http://localhost:5678/webhook-test/ef10708d-6b16-448b-a78a-d755702b8116';
-    const WEBHOOK_SECRET = 'X-xebhook-secret';
+    const WEBHOOK_SECRET = 'tz>oyCd>G*8n|DaKQo1RSX,09>U=';
 
     const form = document.getElementById('testForm');
     const statusDiv = document.getElementById('status');
@@ -146,7 +146,7 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Webhook-Secret': X-xebhook-secret
+            'X-xebhook-Secret': WEBHOOK_SECRET
           },
           body: JSON.stringify(data)
         });
